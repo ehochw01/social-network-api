@@ -1,7 +1,6 @@
 {
-  "name": "23-Ins_Subdoc-Population",
+  "name": "18-NoSQL-Social-Network-API",
   "version": "1.0.0",
-  "description": "Instructor demo for populating subdocs",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -11,6 +10,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "moment": "^2.29.4",
     "mongoose": "^6.0.13"
   },
   "devDependencies": {
