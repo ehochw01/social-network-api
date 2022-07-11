@@ -11,84 +11,91 @@ module.exports = {
   },
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: 'No user with that ID' })
-          : res.json(user)
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : res.json(thought)
       )
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-  // create a new user
-  createUser(req, res) {
-    User.create(req.body)
-      .then((dbUserData) => res.json(dbUserData))
+  createThought(req, res) {
+    Thought.create(req.body)
+        .then(({ _id }) => {
+            return User.findOneAndUpdate(
+                { _id: req.body.userId },
+                { $push: { thoughts: _id } },
+                { new: true }
+            );
+        })
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-  // update User by id
-  updateUser(req, res) {
-    User.findOneAndUpdate(
-      { _id: req.params.userId }, 
+  updateThought(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId }, 
       req.body, 
       { new: true, runValidators: true })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: 'No user with that ID' })
-          : res.json(user)
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : res.json(thought)
       )
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-  // Delete a user and associated thoughts
-  deleteUser(req, res) {
-    User.findOneAndDelete({ _id: req.params.userId })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: 'No user with that ID' })
-          : Thought.deleteMany({ _id: { $in: user.thoughts } })
+
+  
+  deleteThought(req, res) {
+    Thought.findOneAndDelete({ _id: req.params.thoughtId })
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : User.findOneAndUpdate({ _id: req.params.userId },
+            { $pull: { thoughts: req.params.thoughtId } },
+            { new: true })
       )
-      .then(() => res.json({ message: 'User and associated thoughts deleted!' }))
+      .then(() => res.json({ message: 'Thought deleted!' }))
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
-  addFriend(req, res) {
-    User.findOneAndUpdate(
-      { _id: req.params.userId }, 
-      { $push: { friends: req.params.friendId } },
-      { new: true })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: 'No user with that ID' })
-          : res.json(user)
-      )
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  },
-  deleteFriend(req, res) {
-    User.findOneAndUpdate(
-      { _id: req.params.userId }, 
-      { $pull: { friends: req.params.friendId } }, 
-      { new: true })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: 'No user with that ID' })
-          : res.json(user)
-      )
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  }
+  // addFriend(req, res) {
+  //   User.findOneAndUpdate(
+  //     { _id: req.params.userId }, 
+  //     { $push: { friends: req.params.friendId } },
+  //     { new: true })
+  //     .then((user) =>
+  //       !user
+  //         ? res.status(404).json({ message: 'No user with that ID' })
+  //         : res.json(user)
+  //     )
+  //     .catch((err) => {
+  //       console.log(err);
+  //       res.status(500).json(err);
+  //     });
+  // },
+  // deleteFriend(req, res) {
+  //   User.findOneAndUpdate(
+  //     { _id: req.params.userId }, 
+  //     { $pull: { friends: req.params.friendId } }, 
+  //     { new: true })
+  //     .then((user) =>
+  //       !user
+  //         ? res.status(404).json({ message: 'No user with that ID' })
+  //         : res.json(user)
+  //     )
+  //     .catch((err) => {
+  //       console.log(err);
+  //       res.status(500).json(err);
+  //     });
+  // }
 };
 
