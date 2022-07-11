@@ -1,4 +1,5 @@
 const { User, Thought } = require('../models');
+const moment = require('moment');
 
 module.exports = {
   getUsers(req, res) {
@@ -66,7 +67,8 @@ module.exports = {
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId }, 
-      { $push: { friends: req.params.friendId } },
+      // add to set prevents duplicates
+      { $addToSet: { friends: req.params.friendId } },
       { new: true })
       .then((user) =>
         !user
